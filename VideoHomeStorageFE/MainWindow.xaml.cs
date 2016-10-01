@@ -58,17 +58,22 @@ namespace VideoHomeStorage.FE
             FileName = FileLocationTextBox.Text;
             try {
                 // Usee the encoder to turn bytes into an image
-                FileBytes = File.ReadAllBytes(FileName);
                 VHSEncoder Encoder = new VHSEncoder(RowCount, BlockCount, VHSEncoder.BitDepth.byt, ParityEnabled);
-                OutputImage = Encoder.Encode(FileBytes);
-                SaveFileDialog saveFileDialog = new SaveFileDialog();
-                if (saveFileDialog.ShowDialog() == true)
+                StreamOutputWindow sOW = new StreamOutputWindow();
+                FileBytes = File.ReadAllBytes(FileName);
+                byte[] tempByte = new byte[Encoder.BytesPerFrame];
+                Bitmap tempOutput;
+                for (int byteCount = 0; byteCount < FileBytes.Count(); byteCount += Encoder.BytesPerFrame)
                 {
-                    OutputImage.Save(saveFileDialog.FileName);
+                    Array.Copy(FileBytes, byteCount, tempByte, 0, Encoder.BytesPerFrame);
+                    tempOutput = Encoder.Encode(tempByte);
+                    sOW.UpdateImageStream(tempOutput);
                 }
-            } catch (IOException exception) {
-                Debug.WriteLine(exception.Message);
-            }
+                
+                
+                
+                OutputImage = Encoder.Encode(FileBytes);
+                
 
         }
 

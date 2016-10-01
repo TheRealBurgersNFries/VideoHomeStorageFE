@@ -29,6 +29,10 @@ namespace VideoHomeStorage.FE
         private int symbolHeight;
         private int bytesPerFrame;
 
+        public int BytesPerFrame {
+            get { return bytesPerFrame; }
+        }
+
         /// <summary>
         /// Instantiate a VHSEncoder object. This will be used to hold codec information that stays the same across frames
         /// </summary>
