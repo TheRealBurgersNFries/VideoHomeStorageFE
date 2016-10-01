@@ -13,8 +13,8 @@ namespace VideoHomeStorage.FE
         public enum BitDepth { bit = 1, nibble = 4, byt = 8 }; // byte is reserved\
 
         // Configuration constants
-        private static int streamWidth = 480; // Horizontal resolution of frame
-        private static int streamHeight = 333; // Vertical resolution of frame
+        private static int streamWidth = 320; // Horizontal resolution of frame
+        private static int streamHeight = 240; // Vertical resolution of frame
 
         private BitDepth bitDepth = BitDepth.nibble; // Number of bits per symbol
         // Block size is 8 symbols
@@ -39,7 +39,7 @@ namespace VideoHomeStorage.FE
         {
             bitDepth = bitsPerSymbol;
             hBlocks = numRowsPerFrame;
-            parity = true;
+            this.parity = parity;
             vRows = numBlocksPerRow;
 
             numCols = (hBlocks * 8) + (parity ? hBlocks : 0);

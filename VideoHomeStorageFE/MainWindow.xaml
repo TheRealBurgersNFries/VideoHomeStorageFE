@@ -26,8 +26,8 @@
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <Label Name="ColumnCountLabel"
-               Content="Number of Columns:"
+        <Label Name="BlockCountLabel"
+               Content="Number of Blocks:"
                Margin="3"
                Grid.Row="1"
                Grid.RowSpan="2"
@@ -48,7 +48,7 @@
                Margin="3"
                Grid.Row="6"
                Grid.Column="1"/>
-        <TextBox Name="ColumnCountTextBox"
+        <TextBox Name="BlockCountTextBox"
                  HorizontalAlignment="Right"
                  Padding="3,3,3,0"
                  Grid.Row="1"
@@ -73,12 +73,12 @@
                   VerticalAlignment="Center"
                   Grid.Row="6"
                   Grid.Column="2"/>
-        <Button Name="IncrementColumnButton"
+        <Button Name="IncrementBlockButton"
                 FontSize="4"
                 Content="▲"
                 Grid.Row="1"
                 Grid.Column="3"/>
-        <Button Name="DecrementColumnButton"
+        <Button Name="DecrementBlockButton"
                 FontSize="4"
                 Content="▼"
                 Grid.Row="2"

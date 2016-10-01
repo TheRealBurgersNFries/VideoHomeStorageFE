@@ -25,7 +25,7 @@ namespace VideoHomeStorage.FE
     public partial class MainWindow : Window
     {
         private int RowCount = 0;
-        private int ColumnCount = 0;
+        private int BlockCount = 0;
         private bool ParityEnabled = false;
         private string FileName = "";
         private byte[] FileBytes = null;
@@ -34,15 +34,15 @@ namespace VideoHomeStorage.FE
         {
             InitializeComponent();
             // Set the Values of the input boxesot the default values of the variables they correspond to.
-            ColumnCountTextBox.Text = RowCount.ToString();
-            RowCountTextBox.Text = ColumnCount.ToString();
+            BlockCountTextBox.Text = BlockCount.ToString(); 
+            RowCountTextBox.Text = RowCount.ToString();
             FileLocationTextBox.Text = FileName;
             ParityCheckBox.IsChecked = ParityEnabled;
             // Set the functions of the increment buttons
-            IncrementColumnButton.Click += IncrementColumnButton_Click;
+            IncrementBlockButton.Click += IncrementBlockButton_Click;
             IncrementRowButton.Click += IncrementRowButton_Click;
             // Set the functions of the decrement buttons
-            DecrementColumnButton.Click += DecrementColumnButton_Click;
+            DecrementBlockButton.Click += DecrementBlockButton_Click;
             DecrementRowButton.Click += DecrementRowButton_Click;
             // Set the function of changing the ParityCheckBox
             ParityCheckBox.Checked += ParityCheckBox_ValueChange;
@@ -59,7 +59,8 @@ namespace VideoHomeStorage.FE
             try {
                 // Usee the encoder to turn bytes into an image
                 FileBytes = File.ReadAllBytes(FileName);
-                OutputImage = VHSEncoder.Encode(FileBytes);
+                VHSEncoder Encoder = new VHSEncoder(RowCount, BlockCount, VHSEncoder.BitDepth.byt, ParityEnabled);
+                OutputImage = Encoder.Encode(FileBytes);
                 SaveFileDialog saveFileDialog = new SaveFileDialog();
                 if (saveFileDialog.ShowDialog() == true)
                 {
@@ -86,10 +87,10 @@ namespace VideoHomeStorage.FE
             ParityEnabled = (bool)ParityCheckBox.IsChecked;
         }
 
-        private void IncrementColumnButton_Click(object sender, RoutedEventArgs e)
+        private void IncrementBlockButton_Click(object sender, RoutedEventArgs e)
         {
-            ColumnCount++;
-            ColumnCountTextBox.Text = ColumnCount.ToString();
+            BlockCount++;
+            BlockCountTextBox.Text = BlockCount.ToString();
         }
 
         private void IncrementRowButton_Click(object sender, RoutedEventArgs e)
@@ -98,10 +99,10 @@ namespace VideoHomeStorage.FE
             RowCountTextBox.Text = RowCount.ToString();
         }
 
-        private void DecrementColumnButton_Click(object sender, RoutedEventArgs e)
+        private void DecrementBlockButton_Click(object sender, RoutedEventArgs e)
         {
-            ColumnCount--;
-            ColumnCountTextBox.Text = ColumnCount.ToString();
+            BlockCount--;
+            BlockCountTextBox.Text = BlockCount.ToString();
         }
 
         private void DecrementRowButton_Click(object sender, RoutedEventArgs e)
