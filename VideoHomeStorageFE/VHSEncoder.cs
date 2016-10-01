@@ -8,28 +8,48 @@ using System.Drawing;
 
 namespace VideoHomeStorage.FE
 {
-    public static class VHSEncoder
+    public class VHSEncoder
     {
-        private enum BitDepth { bit = 1, nibble = 4, byt = 8 }; // byte is reserved\
+        public enum BitDepth { bit = 1, nibble = 4, byt = 8 }; // byte is reserved\
 
         // Configuration constants
         private static int streamWidth = 480; // Horizontal resolution of frame
         private static int streamHeight = 333; // Vertical resolution of frame
 
-        private static BitDepth bitDepth = BitDepth.nibble; // Number of bits per symbol
+        private BitDepth bitDepth = BitDepth.nibble; // Number of bits per symbol
         // Block size is 8 symbols
-        private static int hBlocks = 2; // Number of data blocks per line
-        private static bool parity = true; // Whether a pairity symbol is included after each data block
-        private static int vRows = 1; // Number of rows/lines per frame
+        private int hBlocks = 2; // Number of data blocks per line
+        private bool parity = true; // Whether a pairity symbol is included after each data block
+        private int vRows = 1; // Number of rows/lines per frame
 
         // Derived constants
-        private static int numCols = (hBlocks * 8) + (parity ? hBlocks : 0);
-        private static int numRows = vRows;
-        private static int symbolWidth = streamWidth / numCols;
-        private static int symbolHeight = streamHeight / numRows;
-        private static int bytesPerFrame = (int)(hBlocks * 8 * vRows * ((float)bitDepth / 8F));
+        private int numCols;
+        private int numRows;
+        private int symbolWidth;
+        private int symbolHeight;
+        private int bytesPerFrame;
 
-        public static Bitmap Encode(byte[] data)
+        /// <summary>
+        /// Instantiate a VHSEncoder object. This will be used to hold codec information that stays the same across frames
+        /// </summary>
+        /// <param name="numBlocksPerRow">The number of 8 symbol (+ parity, if enabled) blocks in a row</param>
+        /// <param name="numRowsPerFrame">The number of rows in a frame</param>
+        /// <param name="bitsPerSymbol">The number of bits encoded per symbol</param>
+        public VHSEncoder(int numBlocksPerRow = 2, int numRowsPerFrame = 1, BitDepth bitsPerSymbol = BitDepth.nibble, bool parity = true)
+        {
+            bitDepth = bitsPerSymbol;
+            hBlocks = numRowsPerFrame;
+            parity = true;
+            vRows = numBlocksPerRow;
+
+            numCols = (hBlocks * 8) + (parity ? hBlocks : 0);
+            numRows = vRows;
+            symbolWidth = streamWidth / numCols;
+            symbolHeight = streamHeight / numRows;
+            bytesPerFrame = (int)(hBlocks * 8 * vRows * ((float)bitDepth / 8F));
+        }
+
+        public Bitmap Encode(byte[] data)
         {
             if (data.Count() > bytesPerFrame)
             {
@@ -104,7 +124,7 @@ namespace VideoHomeStorage.FE
             return bmp;
         }
 
-        private static int calculateValue(byte[] data, int i_data, int bytePos, BitDepth bitDepth)
+        private int calculateValue(byte[] data, int i_data, int bytePos, BitDepth bitDepth)
         {
             int val;
             switch(bitDepth)
@@ -132,7 +152,7 @@ namespace VideoHomeStorage.FE
             }
         }
 
-        private static int calculateParity(byte[] data, int i_data)
+        private int calculateParity(byte[] data, int i_data)
         {
             
             switch (bitDepth)
@@ -179,7 +199,7 @@ namespace VideoHomeStorage.FE
             }
         }
 
-        private static void fillSymbol(Graphics g, int i_row, int i_col, int val)
+        private void fillSymbol(Graphics g, int i_row, int i_col, int val)
         {
             int xPos = i_col * symbolWidth;
             int yPos = i_row * symbolHeight;
@@ -189,7 +209,7 @@ namespace VideoHomeStorage.FE
             g.FillRectangle(b, symbol);
         }
 
-        public static void Decode()
+        public void Decode()
         {
 
         }
