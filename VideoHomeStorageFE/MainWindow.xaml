@@ -5,8 +5,104 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VideoHomeStorageFE"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        
+        Title="Video Home Storage" Height="350" Width="525">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Label Name="ColumnCountLabel"
+               Content="Number of Columns:"
+               Margin="3"
+               Grid.Row="1"
+               Grid.RowSpan="2"
+               Grid.Column="1"/>
+        <Label Name="RowCountLabel"
+               Content="Number of Rows:"
+               Margin="3"
+               Grid.Row="3"
+               Grid.RowSpan="2"
+               Grid.Column="1"/>
+        <Label Name="FileLocationLabel"
+               Content="File Location:"
+               Margin="3"
+               Grid.Row="5"
+               Grid.Column="1"/>
+        <Label Name="ParityLabel"
+               Content="Parity:"
+               Margin="3"
+               Grid.Row="6"
+               Grid.Column="1"/>
+        <TextBox Name="ColumnCountTextBox"
+                 HorizontalAlignment="Right"
+                 Padding="3,3,3,0"
+                 Grid.Row="1"
+                 Grid.RowSpan="2"
+                 Grid.Column="2"
+                 Width="100"/>
+        <TextBox Name="RowCountTextBox"
+                 HorizontalAlignment="Right"
+                 Padding="3,3,3,0"
+                 Grid.Row="3"
+                 Grid.RowSpan="2"
+                 Grid.Column="2"
+                 Width="100"/>
+        <TextBox Name="FileLocationTextBox"
+                 HorizontalAlignment="Right"
+                 Grid.Row="5"
+                 Grid.Column="2"
+                 Width="100"/>
+        <CheckBox Name="ParityCheckBox"
+                  Margin="3"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  Grid.Row="6"
+                  Grid.Column="2"/>
+        <Button Name="IncrementColumnButton"
+                FontSize="4"
+                Content="▲"
+                Grid.Row="1"
+                Grid.Column="3"/>
+        <Button Name="DecrementColumnButton"
+                FontSize="4"
+                Content="▼"
+                Grid.Row="2"
+                Grid.Column="3"/>
+        <Button Name="IncrementRowButton"
+                FontSize="4"
+                Content="▲"
+                Grid.Row="3"
+                Grid.Column="3"/>
+        <Button Name="DecrementRowButton"
+                FontSize="4"
+                Content="▼"
+                Grid.Row="4"
+                Grid.Column="3"/>
+        <Button Name="BrowseButton"
+                Content="Browse"
+                Margin="3"
+                Grid.Row="5"
+                Grid.Column="4"
+                Width="100"/>
+        <Button Name="SubmitButton"
+                Content="Backup"
+                Margin="3"
+                Grid.Row="6"
+                Grid.Column="4"/>
     </Grid>
 </Window>
