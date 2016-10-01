@@ -53,8 +53,14 @@ namespace VideoHomeStorage.FE
             bytesPerFrame = (int)(hBlocks * 8 * vRows * ((float)bitDepth / 8F));
         }
 
+        /// <summary>
+        /// Encode an array of bytes into an image "frame" using the settings initialized in the class
+        /// </summary>
+        /// <param name="data">The byte array to be encoded</param>
+        /// <returns>The encoded bitmap image</returns>
         public Bitmap Encode(byte[] data)
         {
+            // Input data / settings sanity check
             if (data.Count() > bytesPerFrame)
             {
                 throw new ArgumentException("Given " + data.Count() + " bytes. Cannot encode more than " + bytesPerFrame + " bytes per frame!");
@@ -62,66 +68,52 @@ namespace VideoHomeStorage.FE
 
             Bitmap bmp = new Bitmap(streamWidth, streamHeight);
             Graphics g = Graphics.FromImage(bmp);
+            g.Clear(Color.FromArgb(127, 127, 127)); // Clear it to half grey so any unwritten pixels have less sharp edges
+            // Note: there will be unwritten pixels at the right side of the screen unless things divide perfectly, because it's just
+            //       so much easier computationally to place the symbols.
 
-            int i_data, i_row, i_col;
-            i_row = 0;
-            i_col = 0;
-            int bytePos = 0; // Used for bit-depths less than byte to keep track of the position in the current bit
-            for (i_data = 0; i_data < data.Count() - 1;)
+            int iData = 0; // Iterator through data [0:data.Count()-1]
+            int iRow = 0;  // Iterator through rows [0:numRows-1]
+            int iCol = 0;  // Iterator through columns [0:numCols-1]
+            int iByte = 0; // Used for bit-depths less than byte to keep track of the position in the current bit
+
+            int val = 0;   // The value being written to the current symbol
+
+            while (iData < data.Count())
             {
-                int val = 0;
-
-                if (i_data % (int)bitDepth == 0 && i_col > (int)bitDepth && parity)
+                if(parity && ((iCol + 1) % 9 == 0))
                 {
-                    // We need to insert a parity symbol here
-                    val = calculateParity(data, i_data);
-                    fillSymbol(g, i_row, i_col, val);
-                    i_col++; // We are going to another column
-                    if(i_col == numCols - 1)
+                    // This symbol is parity
+                    val =  calculateParity(data, iData);
+                    fillSymbol(g, iRow, iCol, val);
+                }
+                else
+                {
+                    // This symbol is data
+                    val = calculateValue(data, iData, iByte, bitDepth);
+                    fillSymbol(g, iRow, iCol, val);
+
+                    // Data position logic
+                    iByte++;
+                    if (iByte >= (8 / (int)bitDepth))
                     {
-                        // We are going to another row
-                        i_col = 0;
-                        i_row++;
+                        iByte = 0;
+                        iData++;
                     }
-                    continue;
                 }
 
-                switch(bitDepth)
+                // Frame position logic
+                iCol++;
+                if(iCol >= numCols)
                 {
-                    case BitDepth.bit:
-                        val = calculateValue(data, i_data, bytePos, bitDepth);
-                        bytePos++;
-                        if(bytePos % 8 == 0)
-                        {
-                            bytePos = 0;
-                            i_data++; // We finished a byte!
-                        }
-                        break;
-                    case BitDepth.nibble:
-                        val = calculateValue(data, i_data, bytePos, bitDepth);
-                        bytePos++;
-                        if (bytePos % 2 == 0)
-                        {
-                            bytePos = 0;
-                            i_data++; // We finished a byte!
-                        }
-                        break;
-                    case BitDepth.byt:
-                        val = calculateValue(data, i_data, bytePos, bitDepth);
-                        i_data++; // We finished a byte!
-                        break;
-                    default:
-                        throw new ApplicationException("Invalid bit depth! This shouldn't happen...");
+                    iCol = 0;
+                    iRow++;
                 }
 
-                fillSymbol(g, i_row, i_col, val);
-
-                i_col++; // We are going to another column
-                if (i_col == numCols - 1)
+                // Frame/Data position sanity check
+                if(iRow >= numRows && iData < data.Count())
                 {
-                    // We are going to another row
-                    i_col = 0;
-                    i_row++;
+                    throw new ApplicationException("Frame position and Data position out of sync! Frame encode failed!");
                 }
             }
 
