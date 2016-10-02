@@ -31,6 +31,8 @@ namespace VideoHomeStorage.FE
     {
         private FilterInfoCollection Cards;
         Bitmap LastFrame;
+        private List<Bitmap> Images = new List<Bitmap>();
+        private VHSEncoder Encoder = null;
         public StreamInputWindow()
         {
             InitializeComponent();
@@ -54,20 +56,34 @@ namespace VideoHomeStorage.FE
 
         private void VideoStreamPlayer_NewFrame(object sender, ref Bitmap image)
         {
+            
             if (LastFrame != null)
             {
                 ThresholdedDifference filter = new ThresholdedDifference(20);
                 filter.OverlayImage = LastFrame;
                 Bitmap resultImage = filter.Apply(image);
-                SaveFileDialog dlg = new SaveFileDialog();
-                if (dlg.ShowDialog() == true)
+                int whiteColor = 0;
+                int blackColor = 0;
+                for (int x = 0; x < resultImage.Width; x++)
                 {
-                    resultImage.Save(dlg.FileName);
-                }
-                ImageStatistics checkDifference = new ImageStatistics(resultImage);
+                    for (int y = 0; y < resultImage.Height; y++)
+                    {
+                        System.Drawing.Color color = resultImage.GetPixel(x, y);
 
-            }
-            
+                        if (color.ToArgb() == System.Drawing.Color.White.ToArgb())
+                        {
+                            whiteColor++;
+                        }
+
+                        else
+                            if (color.ToArgb() == System.Drawing.Color.White.ToArgb())
+                        {
+                            blackColor++;
+                        }
+                    }
+
+                }
+            }            
             LastFrame = image;
         }
 
