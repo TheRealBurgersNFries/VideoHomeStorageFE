@@ -16,6 +16,7 @@ using System.Windows.Shapes;
 using Microsoft.Win32;
 using System.IO;
 using System.Diagnostics;
+using System.Threading;
 
 namespace VideoHomeStorage.FE
 {
@@ -52,29 +53,15 @@ namespace VideoHomeStorage.FE
             SubmitButton.Click += SubmitButton_Click;
         }
 
-        private void SubmitButton_Click(object sender, RoutedEventArgs e)
+        private async void SubmitButton_Click(object sender, RoutedEventArgs e)
         {
             // Actually set the variable equal to the input box for FileName
             FileName = FileLocationTextBox.Text;
-            try {
-                // Usee the encoder to turn bytes into an image
-                VHSEncoder Encoder = new VHSEncoder(RowCount, BlockCount, VHSEncoder.BitDepth.byt, ParityEnabled);
-                StreamOutputWindow sOW = new StreamOutputWindow();
-                FileBytes = File.ReadAllBytes(FileName);
-                byte[] tempByte = new byte[Encoder.BytesPerFrame];
-                Bitmap tempOutput;
-                for (int byteCount = 0; byteCount < FileBytes.Count(); byteCount += Encoder.BytesPerFrame)
-                {
-                    Array.Copy(FileBytes, byteCount, tempByte, 0, Encoder.BytesPerFrame);
-                    tempOutput = Encoder.Encode(tempByte);
-                    sOW.UpdateImageStream(tempOutput);
-                }
-                
-                
-                
-                OutputImage = Encoder.Encode(FileBytes);
-                
-
+            RowCount = Int16.Parse(RowCountTextBox.Text);
+            BlockCount = Int16.Parse(BlockCountTextBox.Text);
+            FileBytes = File.ReadAllBytes(FileName);
+            StreamOutputWindow sOW = new StreamOutputWindow(RowCount, BlockCount, ParityEnabled, FileBytes);
+            sOW.Show();
         }
 
         private void BrowseButton_Click(object sender, RoutedEventArgs e)
