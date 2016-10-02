@@ -58,7 +58,7 @@ namespace VideoHomeStorage.FE
         /// </summary>
         /// <param name="data">The byte array to be encoded</param>
         /// <returns>The encoded bitmap image</returns>
-        public Bitmap Encode(byte[] data)
+        public async Task<Bitmap> Encode(byte[] data)
         {
             // Input data / settings sanity check
             if (data.Count() > bytesPerFrame)
