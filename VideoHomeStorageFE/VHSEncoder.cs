@@ -48,14 +48,14 @@ namespace VideoHomeStorage.FE
         public VHSEncoder(int numBlocksPerRow = 2, int numRowsPerFrame = 1, BitDepth bitsPerSymbol = BitDepth.nibble, bool parity = true)
         {
             bitDepth = bitsPerSymbol;
-            hBlocks = numRowsPerFrame;
+            hBlocks = numBlocksPerRow;
             this.parity = parity;
-            vRows = numBlocksPerRow;
+            vRows = numRowsPerFrame;
 
             numCols = (hBlocks * 8) + (parity ? hBlocks : 0);
             numRows = vRows;
             symbolWidth = streamWidth / numCols;
-            symbolHeight = streamHeight / numRows;
+            symbolHeight = streamHeight / (numRows + 1);
             bytesPerFrame = (int)(hBlocks * 8 * vRows * ((float)bitDepth / 8F));
 
             totalMarginH = streamWidth - ((numCols + 1) * symbolWidth);
@@ -233,7 +233,7 @@ namespace VideoHomeStorage.FE
 
             numBadBytes = 0;
 
-            byte[] data = new byte[bytesPerFrame];
+            byte[] data = new byte[bytesPerFrame + 1];
 
             int iData = 0; // Iterator through data [0:data.Count()-1]
             int iRow = 0;  // Iterator through rows [0:numRows-1]
@@ -282,6 +282,8 @@ namespace VideoHomeStorage.FE
                     throw new ApplicationException("Frame position and Data position out of sync! Frame encode failed!");
                 }
             }
+
+            data[iData] = (byte)'\0';
 
             return data;
         }
@@ -335,7 +337,7 @@ namespace VideoHomeStorage.FE
             {
                 for (int j = 0; j < symbolHeight; j++)
                 {
-                    runningSum += bmp.GetPixel(i, j).GetBrightness();
+                    runningSum += bmp.GetPixel(i + xPos, j + yPos).GetBrightness() * 255;
                 }
             }
 
