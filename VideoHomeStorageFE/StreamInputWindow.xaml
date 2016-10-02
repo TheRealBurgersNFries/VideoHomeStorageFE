@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VideoHomeStorage.FE"
+        xmlns:controls="clr-namespace:AForge.Controls;assembly=AForge.Controls"
         mc:Ignorable="d"
         Title="StreamInputWindow" Height="300" Width="300">
     <Grid>
@@ -21,6 +22,11 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="5"/>
         </Grid.ColumnDefinitions>
+        <WindowsFormsHost x:Name="VideoSourceWindowsFormsHost"
+                          Margin="10"
+                          Background="Transparent">
+            <controls:VideoSourcePlayer x:Name="VideoStreamPlayer" />
+        </WindowsFormsHost>
         <Button Name="BeginStreamButton"
                 Content="Start Stream"
                 Grid.Row="2"
