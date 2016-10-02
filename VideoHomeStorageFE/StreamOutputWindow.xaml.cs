@@ -80,7 +80,7 @@ namespace VideoHomeStorage.FE
                         {
                             StreamBox.Source = image;
                         }));
-                        Thread.Sleep(200);
+                        Thread.Sleep(132);
                     });
                 }
             }
