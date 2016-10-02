@@ -205,13 +205,22 @@ namespace VideoHomeStorage.FE
             g.FillRectangle(b, symbol);
         }
 
-        public byte[] Decode(Bitmap bmp, int bytesInFrame)
+        /// <summary>
+        /// Decode an array of bytes from an image "frame" using the settings initialized in the class
+        /// </summary>
+        /// <param name="bmp">The input image</param>
+        /// <param name="bytesInFrame">Number of bytes we need to get out of this frame</param>
+        /// <param name="numBadBytes">Out the number of times a parity check failed</param>
+        /// <returns>The decoded data as a byte array</returns>
+        public byte[] Decode(Bitmap bmp, int bytesInFrame, out int numBadBytes)
         {
             // Input data / settings sanity check
             if (bmp.Width != streamWidth || bmp.Height != streamHeight)
             {
                 throw new ArgumentException("Error! Input image resolution " + bmp.Width + "x" + bmp.Height + " Expected resolution " + streamWidth + "x" + streamHeight);
             }
+
+            numBadBytes = 0;
 
             byte[] data = new byte[bytesPerFrame];
 
@@ -230,7 +239,7 @@ namespace VideoHomeStorage.FE
                     val = readSymbol(bmp, iRow, iCol);
                     if (!checkParity(data, iData, val))
                     {
-                        // Do nothing for now
+                        numBadBytes++;
                     }
                 }
                 else
