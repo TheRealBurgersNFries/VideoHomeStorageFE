@@ -14,9 +14,13 @@ using System.Windows.Shapes;
 using AForge.Video.DirectShow;
 using AForge.Controls;
 using AForge.Video;
+using AForge.Imaging.Filters;
 using System.Drawing;
 using System.IO;
 using System.Threading;
+using Microsoft.Win32;
+using System.Diagnostics;
+using AForge.Imaging;
 
 namespace VideoHomeStorage.FE
 {
@@ -26,6 +30,7 @@ namespace VideoHomeStorage.FE
     public partial class StreamInputWindow : Window
     {
         private FilterInfoCollection Cards;
+        Bitmap LastFrame;
         public StreamInputWindow()
         {
             InitializeComponent();
@@ -41,6 +46,7 @@ namespace VideoHomeStorage.FE
         private void BeginStreamButton_Click(object sender, RoutedEventArgs e)
         {
             VideoCaptureDevice FinalVideo = new VideoCaptureDevice(Cards[DeviceComboBox.SelectedIndex].MonikerString);
+            FinalVideo.CrossbarVideoInput = FinalVideo.AvailableCrossbarVideoInputs[0];
             VideoStreamPlayer.VideoSource = FinalVideo;
             VideoStreamPlayer.NewFrame += VideoStreamPlayer_NewFrame;
             VideoStreamPlayer.Start();
@@ -48,7 +54,21 @@ namespace VideoHomeStorage.FE
 
         private void VideoStreamPlayer_NewFrame(object sender, ref Bitmap image)
         {
+            if (LastFrame != null)
+            {
+                ThresholdedDifference filter = new ThresholdedDifference(20);
+                filter.OverlayImage = LastFrame;
+                Bitmap resultImage = filter.Apply(image);
+                SaveFileDialog dlg = new SaveFileDialog();
+                if (dlg.ShowDialog() == true)
+                {
+                    resultImage.Save(dlg.FileName);
+                }
+                ImageStatistics checkDifference = new ImageStatistics(resultImage);
+
+            }
             
+            LastFrame = image;
         }
 
         private BitmapImage BitmapToImageSource(Bitmap bitmap)
