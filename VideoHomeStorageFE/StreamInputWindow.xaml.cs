@@ -33,6 +33,9 @@ namespace VideoHomeStorage.FE
         Bitmap LastFrame;
         private List<Bitmap> Images = new List<Bitmap>();
         private VHSEncoder Encoder = null;
+        private int Frames;
+        private int Bytes;
+        private int LastFrameBytes;
         public StreamInputWindow()
         {
             InitializeComponent();
@@ -81,10 +84,67 @@ namespace VideoHomeStorage.FE
                             blackColor++;
                         }
                     }
-
                 }
+                if (Encoder == null)
+                {
+                    VHSEncoder Header = new VHSEncoder(4, 1, VHSEncoder.BitDepth.nibble, false);
+                    int error;
+                    byte[] header = Header.Decode(image, 14, out error);
+                    byte[] bytesPerFrameByte = new byte[4];
+                    byte[] bytesLastFrameByte = new byte[4];
+                    byte[] countFrameByte = new byte[4];
+                    Array.Copy(header, 0, bytesPerFrameByte, 0, 4);
+                    Array.Copy(header, 4, bytesLastFrameByte, 0, 4);
+                    Array.Copy(header, 8, countFrameByte, 0, 4);
+                    byte blockByte = header[12];
+                    byte rowByte = header[13];
+                    byte parityByte = header[14];
+                    Bytes = BitConverter.ToInt32(bytesPerFrameByte, 0);
+                    LastFrameBytes = BitConverter.ToInt32(bytesLastFrameByte, 0);
+                    Frames = BitConverter.ToInt32(countFrameByte, 0);
+                    int blocks = (int)blockByte;
+                    int rows = (int)rowByte;
+                    bool parity = Convert.ToBoolean(parityByte);
+
+                    Encoder = new VHSEncoder(blocks, rows, VHSEncoder.BitDepth.byt, parity);
+                }
+                else if (whiteColor > blackColor)
+                {
+                    Images.Add(image);
+                    if (Images.Count() == Frames)
+                    {
+                        VideoStreamPlayer.Stop();
+                        DecodeStream();
+                    }
+                }
+
             }            
             LastFrame = image;
+        }
+
+        private void DecodeStream()
+        {
+            byte[] fullStream = new byte[(Frames - 1) * Bytes + LastFrameBytes];
+            for (int imagen = 0; imagen < Images.Count(); imagen++)
+            {
+                var image = Images[imagen];
+                int error;
+                if (imagen < Images.Count() - 1)
+                {
+                    byte[] imageStream = Encoder.Decode(image, Bytes, out error);
+                    Array.Copy(imageStream, 0, fullStream, imagen * Bytes, Bytes);
+                }
+                else
+                {
+                    byte[] imageStream = Encoder.Decode(image, LastFrameBytes, out error);
+                    Array.Copy(imageStream, 0, fullStream, imagen * Bytes, LastFrameBytes);
+                }
+            }
+            SaveFileDialog dlg = new SaveFileDialog();
+            if (dlg.ShowDialog() == true)
+            {
+                File.WriteAllBytes(dlg.FileName, fullStream);
+            }
         }
 
         private BitmapImage BitmapToImageSource(Bitmap bitmap)

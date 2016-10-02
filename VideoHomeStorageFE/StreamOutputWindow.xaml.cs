@@ -56,15 +56,17 @@ namespace VideoHomeStorage.FE
                 VHSEncoder Encoder = new VHSEncoder(RowCount, BlockCount, VHSEncoder.BitDepth.byt, ParityEnabled);
                 byte[] perFrame = BitConverter.GetBytes(Encoder.BytesPerFrame);
                 byte[] lastFrame = BitConverter.GetBytes(FileBytes.Length % Encoder.BytesPerFrame);
+                byte[] countFrame = BitConverter.GetBytes(FileBytes.Length / Encoder.BytesPerFrame);
                 byte block = (byte)BlockCount;
                 byte row = (byte)RowCount;
                 byte parity = Convert.ToByte(ParityEnabled);
-                byte[] headerEncoder = new byte[16];
+                byte[] headerEncoder = new byte[11];
                 Array.Copy(perFrame, headerEncoder, 4);
                 Array.Copy(lastFrame, 0, headerEncoder, 4, 4);
-                headerEncoder[8] = block;
-                headerEncoder[9] = row;
-                headerEncoder[10] = parity;
+                Array.Copy(countFrame, 0, headerEncoder, 8, 4);
+                headerEncoder[12] = block;
+                headerEncoder[13] = row;
+                headerEncoder[14] = parity;
 
                 StreamBox.Source = BitmapToImageSource(await Header.Encode(headerEncoder));
                 byte[] frame;
