@@ -29,6 +29,12 @@ namespace VideoHomeStorage.FE
         private int symbolHeight;
         private int bytesPerFrame;
 
+        // Margin and Centering
+        private int totalMarginH = 0;
+        private int totalMarginV = 0;
+        private int leftMargin = 0;
+        private int topMargin = 0;
+
         public int BytesPerFrame {
             get { return bytesPerFrame; }
         }
@@ -51,6 +57,11 @@ namespace VideoHomeStorage.FE
             symbolWidth = streamWidth / numCols;
             symbolHeight = streamHeight / numRows;
             bytesPerFrame = (int)(hBlocks * 8 * vRows * ((float)bitDepth / 8F));
+
+            totalMarginH = streamWidth - ((numCols + 1) * symbolWidth);
+            totalMarginV = streamHeight - ((numRows + 1) * symbolHeight);
+            leftMargin = totalMarginH / 2;
+            topMargin = totalMarginV / 2;
         }
 
         /// <summary>
@@ -197,8 +208,8 @@ namespace VideoHomeStorage.FE
 
         private void fillSymbol(Graphics g, int i_row, int i_col, int val)
         {
-            int xPos = i_col * symbolWidth;
-            int yPos = i_row * symbolHeight;
+            int xPos = (i_col * symbolWidth) + leftMargin;
+            int yPos = (i_row * symbolHeight) + topMargin;
             Rectangle symbol = new Rectangle(xPos, yPos, symbolWidth, symbolHeight);
             Color valColor = Color.FromArgb(val, val, val);
             SolidBrush b = new SolidBrush(valColor);
@@ -313,8 +324,8 @@ namespace VideoHomeStorage.FE
         // Simply average all the greyscale values and return it as a byte
         private byte readSymbol(Bitmap bmp, int iRow, int iCol)
         {
-            int xPos = iCol * symbolWidth;
-            int yPos = iRow * symbolHeight;
+            int xPos = (iCol * symbolWidth) + leftMargin;
+            int yPos = (iRow * symbolHeight) + topMargin;
 
             float runningSum = 0;
             int numTerms = symbolWidth * symbolHeight;
