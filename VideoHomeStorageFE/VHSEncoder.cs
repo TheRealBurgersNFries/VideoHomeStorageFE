@@ -155,18 +155,18 @@ namespace VideoHomeStorage.FE
             {
 
                 case BitDepth.bit:
-                    BitArray ba = new BitArray(data[i_data - 1]);
+                    BitArray ba = new BitArray(new byte[] { data[i_data] });
                     bool bval = ba[0];
                     for (int i_bit = 1; i_bit <= 7; i_bit++)
                         bval = bval ^ ba[i_bit];
-                    return Convert.ToInt16(bval);
+                    return Convert.ToInt16(bval) * 255;
 
                 case BitDepth.nibble:
-                    int p_data = i_data - 4;
+                    int p_data = i_data - 3;
                     BitArray ret_val = new BitArray(8);
                     for (int i_bit = 0; i_bit < 4; i_bit++)
                     {
-                        ba = new BitArray(data[p_data + i_bit]);
+                        ba = new BitArray(new byte[] { data[p_data + i_bit] });
                         bval = ba[0];
                         for (int j_bit = 1; j_bit <= 7; j_bit++)
                             bval = bval ^ ba[j_bit];
@@ -174,14 +174,14 @@ namespace VideoHomeStorage.FE
                     }
                     int[] ret = new int[1];
                     ret_val.CopyTo(ret, 0);
-                    return ret[0];
+                    return ret[0] * 17;
 
                 case BitDepth.byt:
-                    p_data = i_data - 8;
+                    p_data = i_data - 7;
                     ret_val = new BitArray(8);
                     for (int i_bit = 0; i_bit < 8; i_bit++)
                     {
-                        ba = new BitArray(data[p_data + i_bit]);
+                        ba = new BitArray(new byte[] { data[p_data + i_bit] });
                         bval = ba[0];
                         for (int j_bit = 1; j_bit <= 7; j_bit++)
                             bval = bval ^ ba[j_bit];

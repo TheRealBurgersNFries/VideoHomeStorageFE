@@ -21,20 +21,9 @@ namespace VideoHomeStorage.FE
     /// </summary>
     public partial class StreamOutputWindow : Window
     {
-        private MemoryStream imageStream = new MemoryStream();
         public StreamOutputWindow()
         {
             InitializeComponent();
-        }
-
-        public void UpdateImageStream(Bitmap NewImage)
-        {
-            NewImage.Save(imageStream, System.Drawing.Imaging.ImageFormat.Bmp);
-        }
-
-        public void UpdateImage(object sender, RoutedEventArgs e)
-        {
-
         }
     }
 }

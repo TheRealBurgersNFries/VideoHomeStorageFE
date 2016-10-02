@@ -56,25 +56,40 @@ namespace VideoHomeStorage.FE
         {
             // Actually set the variable equal to the input box for FileName
             FileName = FileLocationTextBox.Text;
-            try {
+            try
+            {
                 // Usee the encoder to turn bytes into an image
+                VHSEncoder Header = new VHSEncoder(4, 1, VHSEncoder.BitDepth.nibble, false);
                 VHSEncoder Encoder = new VHSEncoder(RowCount, BlockCount, VHSEncoder.BitDepth.byt, ParityEnabled);
-                StreamOutputWindow sOW = new StreamOutputWindow();
-                FileBytes = File.ReadAllBytes(FileName);
-                byte[] tempByte = new byte[Encoder.BytesPerFrame];
-                Bitmap tempOutput;
-                for (int byteCount = 0; byteCount < FileBytes.Count(); byteCount += Encoder.BytesPerFrame)
-                {
-                    Array.Copy(FileBytes, byteCount, tempByte, 0, Encoder.BytesPerFrame);
-                    tempOutput = Encoder.Encode(tempByte);
-                    sOW.UpdateImageStream(tempOutput);
-                }
-                
-                
-                
-                OutputImage = Encoder.Encode(FileBytes);
-                
+                byte[] perFrame = BitConverter.GetBytes(Encoder.BytesPerFrame);
+                byte[] lastFrame = BitConverter.GetBytes(FileBytes.Length % Encoder.BytesPerFrame);
+                byte block = (byte)BlockCount;
+                byte row = (byte)RowCount;
+                byte parity = Convert.ToByte(ParityEnabled);
+                byte[] headerEncoder = new byte[16];
+                Array.Copy(perFrame, headerEncoder, 4);
+                Array.Copy(lastFrame, 0, headerEncoder, 4, 4);
+                headerEncoder[8] = block;
+                headerEncoder[9] = row;
+                headerEncoder[10] = parity;
 
+                StreamOutputWindow sOW = new StreamOutputWindow();
+
+                
+                Bitmap HeaderImage = Header.Encode(headerEncoder);
+
+                
+                FileBytes = File.ReadAllBytes(FileName);
+
+                OutputImage = Encoder.Encode(FileBytes);
+                /*SaveFileDialog saveFileDialog = new SaveFileDialog();
+                if (saveFileDialog.ShowDialog() == true) 
+                    {
+                        {
+                            OutputImage.Save(saveFileDialog.FileName);
+                        }
+                    }*/
+            } catch (Exception exception) { Debug.WriteLine(exception.Message); }
         }
 
         private void BrowseButton_Click(object sender, RoutedEventArgs e)
