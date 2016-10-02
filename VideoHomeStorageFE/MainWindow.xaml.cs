@@ -25,8 +25,8 @@ namespace VideoHomeStorage.FE
     /// </summary>
     public partial class MainWindow : Window
     {
-        private int RowCount = 0;
-        private int BlockCount = 0;
+        private int RowCount = 20;
+        private int BlockCount = 4;
         private bool ParityEnabled = false;
         private string FileName = "";
         private byte[] FileBytes = null;
@@ -51,6 +51,47 @@ namespace VideoHomeStorage.FE
             // Set the functions for the browse and submit values
             BrowseButton.Click += BrowseButton_Click;
             SubmitButton.Click += SubmitButton_Click;
+            SaveButton.Click += SaveButton_Click;
+            DecodeButton.Click += DecodeButton_Click;
+            StreamButton.Click += StreamButton_Click;
+        }
+
+        private void StreamButton_Click(object sender, RoutedEventArgs e)
+        {
+            StreamInputWindow sIW = new StreamInputWindow();
+            sIW.Show();
+        }
+
+        private void DecodeButton_Click(object sender, RoutedEventArgs e)
+        {
+            FileName = FileLocationTextBox.Text;
+            RowCount = Int16.Parse(RowCountTextBox.Text);
+            BlockCount = Int16.Parse(BlockCountTextBox.Text);
+            VHSEncoder Encoder = new VHSEncoder(BlockCount, RowCount, VHSEncoder.BitDepth.byt, ParityEnabled);
+            Bitmap InputImage = new Bitmap(FileName);
+            int error;
+            byte[] OutputBytes = Encoder.Decode(InputImage, Int16.Parse(BytesTextBox.Text), out error);
+            Debug.WriteLine(error);
+            SaveFileDialog dlg = new SaveFileDialog();
+            if (dlg.ShowDialog() == true)
+            {
+                File.WriteAllBytes(dlg.FileName, OutputBytes);
+            }
+        }
+
+        private async void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            FileName = FileLocationTextBox.Text;
+            RowCount = Int16.Parse(RowCountTextBox.Text);
+            BlockCount = Int16.Parse(BlockCountTextBox.Text);
+            VHSEncoder Encoder = new VHSEncoder(BlockCount, RowCount, VHSEncoder.BitDepth.byt, ParityEnabled);
+            FileBytes = File.ReadAllBytes(FileName);
+            Bitmap OutputImage = await Encoder.Encode(FileBytes);
+            SaveFileDialog dlg = new SaveFileDialog();
+            if (dlg.ShowDialog() == true)
+            {
+                OutputImage.Save(dlg.FileName);
+            }
         }
 
         private async void SubmitButton_Click(object sender, RoutedEventArgs e)
